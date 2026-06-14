@@ -1,0 +1,9 @@
+tools:
+  claude:
+    theme: "Phala Green Dark"
+  codex:
+    theme: "Black Metal (Burzum)"
+  ssh:
+    theme: "Night Owl"
+  obsidian:
+    theme: "Borland"

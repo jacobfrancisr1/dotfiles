@@ -1,0 +1,132 @@
+{
+    "editor.fontSize": 14,
+    "editor.lineHeight": 22,
+    "editor.lineNumbers": "relative",
+    "vim.smartRelativeLine": true,
+    "editor.hover.enabled": "off",
+    "terminal.external.osxExec": "Ghostty.app",
+    "editor.minimap.enabled": false,
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "editor.accessibilityPageSize": 40,
+    "editor.inlineSuggest.enabled": true,
+    "files.autoSave": "onFocusChange",
+    "files.autoSaveDelay": 5,
+    "terminal.integrated.inheritEnv": false,
+    "files.exclude": {
+        "**./pytest_cache": true,
+        "**/__pycache__/": true,
+        "**/.ipynb_checkpoints": true,
+        "**/.venv/**": true,
+        "**/*egg-info**": true,
+        "**/uv.lock**": true
+    },
+    "git.ignoreLegacyWarning": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": [
+        "~/dev/"
+    ],
+    "jupyter.completionTriggerCharacters": {
+        "bash": [
+            "$",
+            "{"
+        ],
+        "java": [
+            ".",
+            "@",
+            "#"
+        ],
+        "javascript": [
+            ".",
+            "\"",
+            "'",
+            "/",
+            "@"
+        ],
+        "python": [
+            ".",
+            "%",
+            "'",
+            "\""
+        ],
+        "julia": [
+            "."
+        ],
+        "r": [
+            "[",
+            "(",
+            ",",
+            "$",
+            "@",
+            "\"",
+            "'"
+        ],
+        "rust": [
+            ".",
+            ":"
+        ],
+        "scala": [
+            "."
+        ],
+        "typescript": [
+            ".",
+            "\"",
+            "'",
+            "/",
+            "@",
+            "<"
+        ]
+    },
+    "editor.semanticTokenColorCustomizations": {},
+    "keyboard.touchbar.enabled": false,
+    "workbench.tree.indent": 14,
+    "editor.mouseWheelZoom": true,
+    "vim.enableNeovim": true,
+    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "$HOME/.dotfiles/config/nvim/init.lua",
+    "explorer.sortOrder": "modified",
+    "remote.autoForwardPortsSource": "hybrid",
+    "telemetry.telemetryLevel": "off",
+    "jupyter.askForKernelRestart": false,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "llama-vscode.rag_enabled": false,
+    "llama-vscode.tool_run_terminal_command_enabled": false,
+    "llama-vscode.tool_search_source_enabled": false,
+    "llama-vscode.tool_read_file_enabled": false,
+    "llama-vscode.tool_list_directory_enabled": false,
+    "llama-vscode.tool_regex_search_enabled": false,
+    "llama-vscode.tool_delete_file_enabled": false,
+    "llama-vscode.tool_get_diff_enabled": false,
+    "llama-vscode.tool_edit_file_enabled": false,
+    "llama-vscode.tool_ask_user_enabled": false,
+    "llama-vscode.tool_custom_tool_enabled": false,
+    "llama-vscode.tool_custom_eval_tool_enabled": false,
+    "llama-vscode.tool_llama_vscode_help_enabled": false,
+    "llama-vscode.enabled": false,
+    "editor.wordWrap": "on",
+    "claudeCode.preferredLocation": "panel",
+    "llama-vscode.ask_upgrade_llamacpp_hours": 72000,
+    "focusedFolder.rememberLastFocus": true,
+    "todohighlight.isEnable": true,
+    "todohighlight.defaultStyle": {
+        "color": "red",
+        "backgroundColor": "#ffab00",
+        "overviewRulerColor": "#ffab00",
+        "cursor": "pointer",
+        "border": "1px solid #eee",
+        "borderRadius": "2px",
+        "isWholeLine": false
+    },
+    "workbench.colorTheme": "Gruvbox Dark Hard",
+    "llama-vscode.tool_update_todo_list_enabled": false,
+    "json.schemas": [],
+    "workbench.settings.applyToAllProfiles": [],
+    "[latex]": {
+        "editor.defaultFormatter": "mathematic.vscode-latex"
+    }
+}

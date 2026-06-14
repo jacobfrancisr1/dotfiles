@@ -1,0 +1,173 @@
+# -*- mode: zsh -*-
+# zshrc — zinit-based config
+
+# ─── Zinit bootstrap ───────────────────────────────────────────────────────────
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -f "${ZINIT_HOME}/zinit.zsh" ]]; then
+    print -P "%F{33}▓▒░ Installing zinit…%f"
+    command mkdir -p "$(dirname $ZINIT_HOME)"
+    command git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" && \
+        print -P "%F{34}▓▒░ Done.%f" || \
+        print -P "%F{160}▓▒░ Clone failed.%f"
+fi
+source "${ZINIT_HOME}/zinit.zsh"
+
+# ─── Environment ──────────────────────────────────────────────────────────────
+export XDG_CONFIG_HOME="$HOME/.config"
+HOST="${HOST%%.*}"
+export EDITOR="nvim"
+bindkey -e  # force emacs keybindings — zsh auto-enables vi-mode when EDITOR contains "vi"
+
+ZSH_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ ! -d "$ZSH_CACHE" ]] && mkdir -p "$ZSH_CACHE"
+
+export STARSHIP_CONFIG="$HOME/.dotfiles/config/starship/starship.toml"
+export UV_SYSTEM_CERTS=true
+
+WORDCHARS='*?_[]~=&;!#$%^(){}<>'
+
+# ─── Brew ─────────────────────────────────────────────────────────────────────
+BREW_CACHE="$ZSH_CACHE/brew_shellenv.zsh"
+if [[ "$OSTYPE" == darwin* ]]; then
+    _brew_bin="/opt/homebrew/bin/brew"
+elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    _brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+fi
+if [[ -n "$_brew_bin" ]]; then
+    if [[ ! -f "$BREW_CACHE" ]] || [[ "$_brew_bin" -nt "$BREW_CACHE" ]]; then
+        "$_brew_bin" shellenv > "$BREW_CACHE" 2>/dev/null
+    fi
+    [[ -f "$BREW_CACHE" ]] && source "$BREW_CACHE"
+fi
+unset _brew_bin
+
+# ─── Platform-specific / private config ───────────────────────────────────────
+[[ -f "$HOME/.dotfiles/private/private_init.zsh" ]] && source "$HOME/.dotfiles/private/private_init.zsh"
+
+export PATH="$HOME/.local/bin:$PATH"
+[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+if [[ -d /usr/local/cuda ]]; then
+    export PATH="/usr/local/cuda/bin${PATH:+:${PATH}}"
+    export LD_LIBRARY_PATH="/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+fi
+
+# ─── Brew fpath (must be before compinit) ─────────────────────────────────────
+if [[ -n "$HOMEBREW_PREFIX" && -d "$HOMEBREW_PREFIX/share/zsh/site-functions" ]]; then
+    fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
+fi
+
+# ─── Completion system ────────────────────────────────────────────────────────
+autoload -Uz compinit
+ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -n ${ZCOMPDUMP}(#qN.mh+24) ]]; then
+    compinit -i -d "${ZCOMPDUMP}"
+else
+    compinit -C -i -d "${ZCOMPDUMP}"
+fi
+zstyle ':completion:*' menu select
+
+# ─── History ──────────────────────────────────────────────────────────────────
+export HISTFILE="$ZSH_CACHE/zsh_history_$HOST"
+HISTSIZE=50000
+SAVEHIST=50000
+
+unsetopt share_history
+unsetopt inc_append_history
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+
+# ─── Key bindings ─────────────────────────────────────────────────────────────
+bindkey '[C' forward-word
+bindkey '[D' backward-word
+bindkey '^O' clear-screen
+bindkey '^/' clear-screen
+
+# ─── Zinit plugins (turbo/lazy-loaded) ────────────────────────────────────────
+zinit ice wait lucid atload"_zsh_autosuggest_start"
+zinit light zsh-users/zsh-autosuggestions
+
+zinit ice wait lucid
+zinit light zsh-users/zsh-syntax-highlighting
+
+zinit ice wait lucid blockf
+zinit light zsh-users/zsh-completions
+
+# ─── Tool init ────────────────────────────────────────────────────────────────
+eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
+[[ -o interactive ]] && alias cd="z"
+
+_cache_and_source_completion() {
+    local cache_file="$1"
+    shift
+
+    local generator_bin="$1"
+    if [[ ! -x "$generator_bin" ]]; then
+        return
+    fi
+
+    if [[ ! -f "$cache_file" || "$generator_bin" -nt "$cache_file" ]]; then
+        "$@" >| "$cache_file" 2>/dev/null
+    fi
+
+    [[ -s "$cache_file" ]] && source "$cache_file"
+}
+
+_cache_and_source_completion "$ZSH_CACHE/uv-completion.zsh" "$commands[uv]" uv generate-shell-completion zsh
+
+_uv_run_mod() {
+    if [[ "$words[2]" == "run" && "$words[CURRENT]" != -* ]]; then
+        _arguments '*:filename:_files'
+    else
+        _uv "$@"
+    fi
+}
+compdef _uv_run_mod uv
+
+(( $+commands[kubectl] )) && _cache_and_source_completion "$ZSH_CACHE/kubectl-completion.zsh" "$commands[kubectl]" kubectl completion zsh
+(( $+commands[docker] )) && _cache_and_source_completion "$ZSH_CACHE/docker-completion.zsh" "$commands[docker]" docker completion zsh
+(( $+commands[rustup] )) && _cache_and_source_completion "$ZSH_CACHE/rustup-completion.zsh" "$commands[rustup]" rustup completions zsh
+
+# ─── Autocfg modules ─────────────────────────────────────────────────────────
+source "$HOME/.dotfiles/zsh/autocfg/aliases.zsh"
+source "$HOME/.dotfiles/zsh/autocfg/functions.zsh"
+source "$HOME/.dotfiles/zsh/autocfg/fzf.zsh"
+
+# Misc
+source "$HOME/.dotfiles/zsh/autocfg/git_audit.zsh"
+export DO_NOT_TRACK=1
+
+# ─── NVM lazy loading ────────────────────────────────────────────────────────
+export NVM_DIR="$HOME/.nvm"
+declare -a NODE_GLOBALS=("node" "nvm" "npm" "npx" "yarn" "pnpm" "corepack")
+
+load_nvm() {
+    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+}
+
+for cmd in "${NODE_GLOBALS[@]}"; do
+eval "${cmd}() {
+  unset -f ${NODE_GLOBALS[*]} 2>/dev/null
+  load_nvm
+  command ${cmd} \"\$@\"
+}"
+done
+
+# ─── Bun ──────────────────────────────────────────────────────────────────────
+[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# ─── Starship init ───────────────────────────────────────────────────────────
+eval "$(starship init zsh)"
+
+# ─── Color ghostty must be late so it can wrap Ghostty's ssh function
+[[ -f ~/.config/ghostty/color.zsh ]] && source ~/.config/ghostty/color.zsh

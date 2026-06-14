@@ -1,0 +1,74 @@
+[include]
+    path = ~/.gitconfig-local
+
+[pull]
+    rebase = true
+
+[apply]
+  ignorewhitespace = change
+  whitespace = nowarn
+
+[core]
+	autocrlf = input
+    pager = diff-so-fancy | less --tabs=4 -RF
+    editor = nvim
+	excludesFile = ~/.dotfiles/config/gitconfigs/.gitignore
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+    required = true
+
+[alias]
+    st = status
+    br = branch
+    ci = commit
+    undo = reset --soft HEAD^
+    up = pull --rebase
+    co = checkout
+    cl = clean
+    lg = log --oneline --graph --decorate --all
+    pushall = !git remote | xargs -L1 git push --all
+    supdate = !git submodule update --remote --merge
+    resign = "!f() { git rebase --exec 'git commit --amend --no-edit -n -S' -i \"$1\"; }; f"
+    reset-branch = "!f() { git fetch origin && git stash && git checkout \"$1\" && git reset --hard origin/main && git push --force-with-lease origin \"$1\" && git checkout - && git stash pop 2>/dev/null; }; f"
+    sync = "!f() { git fetch origin && git rebase --autostash origin/${1:-main}; }; f"
+    squash = "!f() { git reset --soft $(git merge-base HEAD ${1:-main}) && git commit; }; f"
+    pushf = push --force-with-lease
+
+[interactive]
+	diffFilter = diff-so-fancy --patch
+
+[color]
+    ui = true
+    interactive = true
+    branch = true
+    status = true
+
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	func = 146 bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+    whitespace = red reverse
+
+[commit]
+    gpgsign = true
+
+[gpg]
+    format = ssh
+
+[init]
+    defaultBranch = main
+
+[push]
+	autoSetupRemote = true
