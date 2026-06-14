@@ -2,7 +2,7 @@
 
 My Mac programming setup: terminal (Ghostty), shell (zsh + starship), editor (Neovim), tmux, and CLI tools.
 
-## How it works (read this first)
+## How it works
 
 Everything lives in this one repo at `~/.dotfiles`. Your home folder doesn't hold real config files — it holds **symlinks** that point into this repo. So:
 
